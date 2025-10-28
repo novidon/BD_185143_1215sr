@@ -1,4 +1,0 @@
-CREATE TABLE pracownik (id_pracownika INT AUTO_INCREMENT PRIMARY KEY, imie VARCHAR(40) NOT NULL, nazwisko VARCHA(60) NOT NULL, data_urodzenia DATE NOT NULL);
-INSERT INTO pracownik (imie, nazwisko, data_urodzenia) VALUES ('Jan', 'Kowalski', '1985-05-15'), ('Anna', 'Nowak', '1990-08-22'), ('Piotr', 'Wiśniewski', '1988-03-10');
-CREATE TABLE zadanie (id_zadania INT AUTO_INCREMENT PRIMARY KEY, nazwa_zadania VARCHAR(150) NOT NULL, priorytet ENUM('normalny', 'wysoki', 'niski'), opis TEXT, pracownik INT, FOREIGN KEY (pracownik) REFERENCES pracownik(id_pracownika) ON DELETE SET NULL);
-ALTER TABLE zadanie MODIFY COLUMN priorytet ENUM('normalny', 'wysoki', 'niski') DEFAULT 'normalny';
