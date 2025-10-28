@@ -1,0 +1,183 @@
+#ZADANIE 1
+
+CREATE TABLE pracownik (
+    id_pracownika INT AUTO_INCREMENT PRIMARY KEY,
+    imie VARCHAR(40) NOT NULL,
+    nazwisko VARCHAR(60) NOT NULL,
+    data_urodzenia DATE NOT NULL
+);
+
+INSERT INTO pracownik (imie, nazwisko, data_urodzenia) VALUES
+('Jan', 'Kowalski', '1990-05-12'),
+('Anna', 'Nowak', '1988-03-21'),
+('Piotr', 'Wiśniewski', '1995-11-02');
+
+UPDATE pracownik
+SET data_urodzenia = '1991-06-15'
+WHERE id_pracownika = 1;
+
+
+
+#ZADANIE 2
+
+CREATE TABLE zadanie (
+    id_zadania INT AUTO_INCREMENT PRIMARY KEY,
+    nazwa_zadania VARCHAR(150) NOT NULL,
+    priorytet ENUM('normalny', 'wysoki', 'niski') DEFAULT 'normalny',
+    opis TEXT,
+    pracownik INT,
+    FOREIGN KEY (pracownik) REFERENCES pracownik(id_pracownika) ON DELETE SET NULL
+);
+
+INSERT INTO zadanie (nazwa_zadania, priorytet, opis, pracownik) VALUES
+('Przygotowanie raportu', 'wysoki', 'Raport miesięczny dla zarządu', 1),
+('Aktualizacja strony WWW', DEFAULT, 'Dodanie nowych treści', 2),
+('Analiza danych sprzedażowych', 'niski', NULL, 3);
+
+
+
+#ZADANIE 3
+
+CREATE TABLE projekt (
+    id_projektu INT AUTO_INCREMENT PRIMARY KEY,
+    nazwa_projektu VARCHAR(150),
+    data_rozpoczecia DATE,
+    data_zakonczenia DATE
+);
+
+ALTER TABLE projekt
+ADD menadzer_projektu INT,
+ADD FOREIGN KEY (menadzer_projektu) REFERENCES pracownik(id_pracownika);
+
+INSERT INTO projekt (nazwa_projektu, data_rozpoczecia, data_zakonczenia, menadzer_projektu) VALUES
+('System CRM', '2024-01-10', NULL, 1),
+('Aplikacja mobilna', '2024-03-15', '2024-09-30', 2);
+
+ALTER TABLE zadanie
+ADD projekt INT,
+ADD FOREIGN KEY (projekt) REFERENCES projekt(id_projektu) ON DELETE CASCADE;
+
+UPDATE zadanie SET projekt = 1 WHERE id_zadania IN (1, 2);
+UPDATE zadanie SET projekt = 2 WHERE id_zadania = 3;
+
+
+
+#ZADANIE 4
+
+CREATE TABLE sprint (
+    id_sprintu INT AUTO_INCREMENT PRIMARY KEY,
+    numer_sprintu INT UNSIGNED,
+    data_rozpoczecia DATE,
+    data_zakonczenia DATE
+);
+
+ALTER TABLE zadanie
+ADD sprint INT,
+ADD FOREIGN KEY (sprint) REFERENCES sprint(id_sprintu) ON DELETE SET NULL;
+
+INSERT INTO sprint (numer_sprintu, data_rozpoczecia, data_zakonczenia)
+VALUES (1, '2024-05-01', '2024-05-15');
+
+UPDATE zadanie SET sprint = 1 WHERE id_zadania IN (1, 2);
+
+
+
+#ZADANIE 5
+
+CREATE TABLE status (
+    id_statusu INT AUTO_INCREMENT PRIMARY KEY,
+    nazwa_statusu VARCHAR(20)
+);
+
+INSERT INTO status (nazwa_statusu) VALUES
+('Nowe'),
+('W trakcie'),
+('Zakończone');
+
+CREATE TABLE zadanie_has_status (
+    id_zdarzenia INT AUTO_INCREMENT PRIMARY KEY,
+    id_zadania INT,
+    id_statusu INT,
+    data_zdarzenia DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_zadania) REFERENCES zadanie(id_zadania) ON DELETE CASCADE,
+    FOREIGN KEY (id_statusu) REFERENCES status(id_statusu)
+);
+
+INSERT INTO zadanie_has_status (id_zadania, id_statusu) VALUES
+(1, 1),
+(2, 2),
+(3, 3);
+
+DELETE FROM projekt WHERE id_projektu = 1;
+
+ALTER TABLE zadanie DROP FOREIGN KEY zadanie_ibfk_3;
+
+DROP TABLE sprint;
+
+
+#KONCOWA BAZA DANYCH
++-----------------------------+
+| Tables_in_infs_tsikhanchukd |
++-----------------------------+
+| pracownik                   |
+| projekt                     |
+| status                      |
+| zadanie                     |
+| zadanie_has_status          |
++-----------------------------+
+
+#PRACOWNIK
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| id_pracownika  | int         | NO   | PRI | NULL    | auto_increment |
+| imie           | varchar(40) | NO   |     | NULL    |                |
+| nazwisko       | varchar(60) | NO   |     | NULL    |                |
+| data_urodzenia | date        | NO   |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+
+#PROJEKT
++-------------------+--------------+------+-----+---------+----------------+
+| Field             | Type         | Null | Key | Default | Extra          |
++-------------------+--------------+------+-----+---------+----------------+
+| id_projektu       | int          | NO   | PRI | NULL    | auto_increment |
+| nazwa_projektu    | varchar(150) | YES  |     | NULL    |                |
+| data_rozpoczecia  | date         | YES  |     | NULL    |                |
+| data_zakonczenia  | date         | YES  |     | NULL    |                |
+| menadzer_projektu | int          | YES  | MUL | NULL    |                |
++-------------------+--------------+------+-----+---------+----------------+
+
+#status
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| id_statusu    | int         | NO   | PRI | NULL    | auto_increment |
+| nazwa_statusu | varchar(20) | YES  |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+
+#ZADANIE
++---------------+-----------------------------------+------+-----+----------+----------------+
+| Field         | Type                              | Null | Key | Default  | Extra          |
++---------------+-----------------------------------+------+-----+----------+----------------+
+| id_zadania    | int                               | NO   | PRI | NULL     | auto_increment |
+| nazwa_zadania | varchar(150)                      | NO   |     | NULL     |                |
+| priorytet     | enum('normalny','wysoki','niski') | YES  |     | normalny |                |
+| opis          | text                              | YES  |     | NULL     |                |
+| pracownik     | int                               | YES  | MUL | NULL     |                |
+| projekt       | int                               | YES  | MUL | NULL     |                |
+| sprint        | int                               | YES  | MUL | NULL     |                |
++---------------+-----------------------------------+------+-----+----------+----------------+
+
+
+#ZADANIE HAS STATUS
++----------------+----------+------+-----+-------------------+-------------------+
+| Field          | Type     | Null | Key | Default           | Extra             |
++----------------+----------+------+-----+-------------------+-------------------+
+| id_zdarzenia   | int      | NO   | PRI | NULL              | auto_increment    |
+| id_zadania     | int      | YES  | MUL | NULL              |                   |
+| id_statusu     | int      | YES  | MUL | NULL              |                   |
+| data_zdarzenia | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++----------------+----------+------+-----+-------------------+-------------------+
+
+
+
