@@ -1,3 +1,6 @@
+
+########## ZESTAW 1 ########
+
 #ZADANIE 1
 
 CREATE TABLE pracownik (
@@ -178,6 +181,148 @@ DROP TABLE sprint;
 | id_statusu     | int      | YES  | MUL | NULL              |                   |
 | data_zdarzenia | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
 +----------------+----------+------+-----+-------------------+-------------------+
+
+########ZESTAW 2########
+
+#ZADANIE 1
+alter table zadanie drop foreign key zadanie_ibfk_1;
+alter table projekt drop foreign key projekt_ibfk_1;
+
+alter table zadanie
+    -> add constraint fk_zadanie_pracownik
+    -> foreign key (pracownik)
+    -> references pracownik(id_pracownika)
+    -> on delete set null;
+
+alter table projekt
+    -> add contraint fk_projekt_menadzer
+    -> foreign key (menadzer_projektu)
+    -> references pracownik(id_pracownika)
+    -> on delete set null;
+
+#ZADANIE 2
+alter table zadanie add godziny_czasowane int default 8;
+
+update zadanie set godziny_czasowane = 4 where id_zadania = 1;
+update zadanie set godziny_czasowane = 12 where id_zadania = 2;
+update zadanie set godziny_czasowane = 16 where id_zadania = 3;
+
+alter table zadanie alter godziny_czasowane set default 6;
+
+insert into zadanie (nazwa_zadania, priorytet, opis, pracownik, projekt)
+    -> values ('Test domyslmej wartosci','normalny','Test kolumny godziny_czasowane', 1, 2);
+
+select id_zadania, nazwa_zadania, godziny_czasowane from zadanie where nazwa_zadania = 'Test domyslmej wartosci';
++------------+-------------------------+-------------------+
+| id_zadania | nazwa_zadania           | godziny_czasowane |
++------------+-------------------------+-------------------+
+|          4 | Test domyslmej wartosci |                 6 |
++------------+-------------------------+-------------------+
+
+delete from zadanie where nazwa_zadania = 'Test domyslmej wartosci';
+
+#ZADANIE 3
+alter table projekt add opis_projektu varchar(50) null;
+
+alter table projekt modify opis_projektu varchar(200);
+
+update projekt set opis_projektu = 'MVP - szybkie wdrozenie' where id_projektu = 2;
+update projekt set opis_projektu = 'Projekt pilny, wdrozenie ASAP' where id_projektu = 3;
+
+alter table projekt drop column opis_projektu;
+
+#ZADANIE 4
+alter table zadanie drop foreign key zadanie_ibfk_2;
+
+alter table zadanie
+    -> add constraint fk_zadanie_projekt
+    -> foreign key(projekt) references projekt(id_projektu)
+    -> on delete set null;
+
+delete from projekt where id_projektu = 2;
+
+select id_zadania, nazwa_zadania, projekt from zadanie;
++------------+-----------------------------+---------+
+| id_zadania | nazwa_zadania               | projekt |
++------------+-----------------------------+---------+
+|          3 | Analiza danych sprzedaowych |    NULL |
++------------+-----------------------------+---------+
+
+#KONCOWA BAZA DANYCH
++-----------------------------+
+| Tables_in_infs_tsikhanchukd |
++-----------------------------+
+| pracownik                   |
+| projekt                     |
+| status                      |
+| zadanie                     |
+| zadanie_has_status          |
++-----------------------------+
+
+#PRACOWNIK
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| id_pracownika  | int         | NO   | PRI | NULL    | auto_increment |
+| imie           | varchar(40) | NO   |     | NULL    |                |
+| nazwisko       | varchar(60) | NO   |     | NULL    |                |
+| data_urodzenia | date        | NO   |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+
+#PROJEKT
++-------------------+--------------+------+-----+---------+----------------+
+| Field             | Type         | Null | Key | Default | Extra          |
++-------------------+--------------+------+-----+---------+----------------+
+| id_projektu       | int          | NO   | PRI | NULL    | auto_increment |
+| nazwa_projektu    | varchar(150) | YES  |     | NULL    |                |
+| data_rozpoczecia  | date         | YES  |     | NULL    |                |
+| data_zakonczenia  | date         | YES  |     | NULL    |                |
+| menadzer_projektu | int          | YES  | MUL | NULL    |                |
++-------------------+--------------+------+-----+---------+----------------+
+
+#STATUS
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| id_statusu    | int         | NO   | PRI | NULL    | auto_increment |
+| nazwa_statusu | varchar(20) | YES  |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+
+#ZADANIE
++-------------------+-----------------------------------+------+-----+----------+----------------+
+| Field             | Type                              | Null | Key | Default  | Extra          |
++-------------------+-----------------------------------+------+-----+----------+----------------+
+| id_zadania        | int                               | NO   | PRI | NULL     | auto_increment |
+| nazwa_zadania     | varchar(150)                      | NO   |     | NULL     |                |
+| priorytet         | enum('normalny','wysoki','niski') | YES  |     | normalny |                |
+| opis              | text                              | YES  |     | NULL     |                |
+| pracownik         | int                               | YES  | MUL | NULL     |                |
+| projekt           | int                               | YES  | MUL | NULL     |                |
+| sprint            | int                               | YES  | MUL | NULL     |                |
+| godziny_czasowane | int                               | YES  |     | 6        |                |
++-------------------+-----------------------------------+------+-----+----------+----------------+
+
+#ZADANIE_HAS_STATUS
++----------------+----------+------+-----+-------------------+-------------------+
+| Field          | Type     | Null | Key | Default           | Extra             |
++----------------+----------+------+-----+-------------------+-------------------+
+| id_zdarzenia   | int      | NO   | PRI | NULL              | auto_increment    |
+| id_zadania     | int      | YES  | MUL | NULL              |                   |
+| id_statusu     | int      | YES  | MUL | NULL              |                   |
+| data_zdarzenia | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++----------------+----------+------+-----+-------------------+-------------------+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
