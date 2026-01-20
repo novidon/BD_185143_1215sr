@@ -1,0 +1,53 @@
+Zadanie 1
+SELECT AVG(salary) FROM EMPLOYEE;
+
+SELECT job_position_id, AVG(salary), COUNT(*) 
+FROM EMPLOYEE 
+GROUP BY job_position_id;
+
+SELECT department_id, AVG(YEAR(CURRENT_DATE) - YEAR(birth_date)) 
+FROM EMPLOYEE 
+GROUP BY department_id;
+
+Zadanie 2
+SELECT department_id, SUM(salary) 
+FROM EMPLOYEE 
+GROUP BY department_id 
+ORDER BY SUM(salary) DESC;
+
+SELECT job_position_id, AVG(salary) 
+FROM EMPLOYEE 
+GROUP BY job_position_id 
+HAVING COUNT(*) >= 3 AND AVG(salary) > 3000;
+
+SELECT department_id, COUNT(DISTINCT salary) 
+FROM EMPLOYEE 
+GROUP BY department_id 
+HAVING COUNT(*) > 4 
+ORDER BY COUNT(DISTINCT salary) ASC;
+
+Zadanie 3
+CREATE TABLE DEPARTMENT AS SELECT * FROM company_2025.DEPARTMENT;
+CREATE TABLE JOB_POSITION AS SELECT * FROM company_2025.JOB_POSITION;
+
+SELECT d.department_name, COUNT(e.employee_id) 
+FROM DEPARTMENT d 
+JOIN EMPLOYEE e ON d.department_id = e.department_id 
+GROUP BY d.department_name;
+
+SELECT d.department_name, e.first_name, e.last_name 
+FROM DEPARTMENT d 
+JOIN EMPLOYEE e ON d.department_id = e.department_id;
+
+ Zadanie 4
+SELECT e.last_name, j.job_position_name 
+FROM EMPLOYEE e 
+NATURAL JOIN JOB_POSITION j 
+WHERE YEAR(e.birth_date) BETWEEN 1990 AND 1999;
+
+SELECT e.first_name, e.last_name 
+FROM EMPLOYEE e 
+JOIN JOB_POSITION j ON e.job_position_id = j.job_position_id 
+WHERE j.job_position_name = 'Magazynier' 
+ORDER BY e.birth_date DESC 
+LIMIT 5;
